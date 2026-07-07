@@ -216,4 +216,6 @@ ISC
 
 ## Author
 
+**Wakadala Mark**
+
 Backend Web Development Project - 2026
