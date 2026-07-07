@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <div class="container">
+    <div class="dashboard-container" id="dashboard">
+      <div class="dashboard-header">
+        <h2>Dashboard</h2>
+        <p class="subtitle">Welcome to your account</p>
+      </div>
+
+      <div class="user-card">
+        <div class="avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <p class="user-name" id="userName">User</p>
+          <p class="user-email" id="userEmail">user@example.com</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">&#128100;</div>
+          <div class="stat-info">
+            <p class="stat-label">Account Status</p>
+            <p class="stat-value">Active</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#128274;</div>
+          <div class="stat-info">
+            <p class="stat-label">Security</p>
+            <p class="stat-value">Protected</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-info">
+        <h3>Session Details</h3>
+        <p>Login Time: <span id="loginTime"></span></p>
+        <p>Session Expires: <span id="sessionExpiry"></span></p>
+      </div>
+
+      <button class="btn logout-btn" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
