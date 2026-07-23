@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: learnhub-lms
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd frontend && npm install && npm run build:prod
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: learnhub-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+
+databases:
+  - name: learnhub-db
+    plan: free
+    databaseName: learnhub
+    user: learnhub_user

@@ -2,17 +2,26 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  max: 50,
-  idleTimeoutMillis: 60000,
-  connectionTimeoutMillis: 5000,
-  allowExitOnIdle: false,
-});
+const pool = process.env.DATABASE_URL
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 50,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 5000,
+      allowExitOnIdle: false,
+    })
+  : new Pool({
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      database: process.env.DB_NAME,
+      max: 50,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 5000,
+      allowExitOnIdle: false,
+    });
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
