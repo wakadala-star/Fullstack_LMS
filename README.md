@@ -2,6 +2,34 @@
 
 A comprehensive full-stack Learning Management System built with Node.js, Express.js, PostgreSQL, and Angular 22. Features role-based access for Admin, Teacher, Student, and Parent users with real-time live classrooms, messaging, quizzes, grading, fee management, and more.
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Click_Here-brightgreen?style=for-the-badge&logo=vercel)](https://your-demo-url.vercel.app)
+
+> **Note:** Replace the demo link above with your actual deployed URL after hosting.
+
+---
+
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+  - [Role-Based System](#role-based-system)
+  - [Authentication](#authentication)
+  - [Courses & Enrollment](#courses--enrollment)
+  - [Quizzes & Grading](#quizzes--grading)
+  - [Live Classrooms](#live-classrooms-agora-webrtc)
+  - [Messaging](#messaging)
+  - [Fee Management](#fee-management)
+  - [Task Management](#task-management)
+  - [Notifications](#notifications)
+  - [Additional Features](#additional-features)
+- [Project Structure](#project-structure)
+- [Database Schema](#database-schema-18-tables)
+- [API Endpoints](#api-endpoints)
+- [Getting Started](#getting-started)
+- [Security](#security)
+- [Default Admin Account](#default-admin-account)
+- [License](#license)
+
 ---
 
 ## Tech Stack
