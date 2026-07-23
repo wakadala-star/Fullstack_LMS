@@ -1,0 +1,348 @@
+<div class="space-y-6">
+  <!-- LOBBY VIEW -->
+  @if (view() === 'lobby') {
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Classroom</h1>
+      <p class="mt-1 text-sm text-gray-500">Start or manage live class sessions</p>
+    </div>
+
+    <!-- Type Selection -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <button (click)="selectType('audio')"
+        class="group p-6 bg-white rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all text-left">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Audio Classroom</h3>
+        <p class="mt-1 text-sm text-gray-500">Voice-only live session with mute controls</p>
+      </button>
+
+      <button (click)="selectType('video')"
+        class="group p-6 bg-white rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all text-left">
+        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Video Classroom</h3>
+        <p class="mt-1 text-sm text-gray-500">Full video session with camera and screen sharing</p>
+      </button>
+    </div>
+
+    <!-- Active/Recent Classrooms -->
+    @if (classrooms().length > 0) {
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-100">
+          <h3 class="text-sm font-semibold text-gray-900">Your Classrooms</h3>
+        </div>
+        <div class="divide-y divide-gray-100">
+          @for (room of classrooms(); track room.id) {
+            <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                  [class]="room.class_type === 'audio' ? 'bg-blue-100' : 'bg-purple-100'">
+                  @if (room.class_type === 'audio') {
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  } @else {
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  }
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ room.title }}</p>
+                  <p class="text-xs text-gray-500">Code: {{ room.join_code }} &middot; {{ room.participant_count || 0 }} joined</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                  [class]="room.status === 'live' ? 'bg-green-100 text-green-700' : room.status === 'waiting' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'">
+                  {{ room.status | titlecase }}
+                </span>
+                @if (room.status === 'waiting' || room.status === 'live') {
+                  <button (click)="rejoinClassroom(room)"
+                    class="px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    Rejoin
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+
+  <!-- CREATE VIEW -->
+  @if (view() === 'create') {
+    <div class="max-w-lg mx-auto">
+      <button (click)="goBack()" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+            [class]="classType() === 'audio' ? 'bg-blue-100' : 'bg-purple-100'">
+            @if (classType() === 'audio') {
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            } @else {
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            }
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Create {{ classType() === 'audio' ? 'Audio' : 'Video' }} Classroom</h3>
+            <p class="text-sm text-gray-500">Set up a new live session</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Class Title</label>
+            <input type="text" [value]="newTitle()" (input)="newTitle.set($any($event.target).value)"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="e.g. Mathematics - Chapter 5" />
+          </div>
+          <button (click)="createClassroom()" [disabled]="!newTitle()"
+            class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Create Classroom
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- CLASSROOM VIEW -->
+  @if (view() === 'classroom' && activeClassroom()) {
+    <div class="space-y-4">
+      <!-- Classroom Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button (click)="goBack()" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">{{ activeClassroom()!.title }}</h2>
+            <p class="text-xs text-gray-500">{{ activeClassroom()!.class_type | titlecase }} Classroom &middot;
+              <span [class]="activeClassroom()!.status === 'live' ? 'text-green-600 font-medium' : 'text-yellow-600'">
+                {{ activeClassroom()!.status === 'live' ? 'LIVE' : 'Waiting' }}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          @if (activeClassroom()!.status === 'waiting') {
+            <button (click)="startClassroom()"
+              class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Start Class
+            </button>
+          }
+          @if (activeClassroom()!.status === 'live') {
+            <button (click)="confirmAttendance()"
+              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Confirm Attendance
+            </button>
+            <button (click)="endClassroom()"
+              class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+              End Class
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Join Code Banner -->
+      <div class="bg-gray-900 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <p class="text-sm text-gray-400">Join Code:</p>
+          <p class="text-2xl font-mono font-bold text-white tracking-widest">{{ activeClassroom()!.join_code }}</p>
+        </div>
+        <button (click)="copyJoinCode()"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+          [class]="copiedCode() ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'">
+          {{ copiedCode() ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+
+      <!-- Classroom Main Area -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Stage / Media Area -->
+        <div class="lg:col-span-2 bg-gray-900 rounded-xl aspect-video relative overflow-hidden">
+          <!-- Local Video -->
+          @if (classType() === 'video' && isLive()) {
+            <div #localVideo class="w-full h-full"></div>
+          } @else if (classType() === 'audio' && isLive()) {
+            <div class="w-full h-full flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <p class="text-green-400 text-sm font-medium">Live Audio Session</p>
+                <p class="text-gray-500 text-xs mt-1">{{ getLiveParticipants().length }} student(s) connected</p>
+              </div>
+            </div>
+          } @else {
+            <div class="w-full h-full flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p class="text-gray-400 text-sm">Click "Start Class" to begin</p>
+              </div>
+            </div>
+          }
+
+          <!-- Bottom Controls -->
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <button (click)="toggleMic()"
+              class="w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+              [class]="isMicOn() ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-red-600 text-white hover:bg-red-500'">
+              @if (isMicOn()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+              }
+            </button>
+
+            @if (classType() === 'video') {
+              <button (click)="toggleCamera()"
+                class="w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+                [class]="isCameraOn() ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-red-600 text-white hover:bg-red-500'">
+                @if (isCameraOn()) {
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                } @else {
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                }
+              </button>
+
+              <button (click)="toggleScreenShare()"
+                class="w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+                [class]="isScreenSharing() ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-gray-700 text-white hover:bg-gray-600'">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Participants Panel -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">Participants ({{ getLiveParticipants().length }})</h3>
+          </div>
+          <div class="max-h-96 overflow-y-auto divide-y divide-gray-50">
+            @for (p of getLiveParticipants(); track p.id) {
+              <div class="p-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                [class.opacity-50]="p.is_suspended">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium text-blue-700">{{ p.name.charAt(0) }}</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{{ p.name }}</p>
+                    <div class="flex items-center gap-1">
+                      @if (p.is_muted) {
+                        <span class="text-[10px] text-red-500">Muted</span>
+                      }
+                      @if (p.is_suspended) {
+                        <span class="text-[10px] text-red-600">Suspended</span>
+                      }
+                      @if (p.can_share_screen) {
+                        <span class="text-[10px] text-blue-500">Screen</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button (click)="toggleMute(p)" [title]="p.is_muted ? 'Unmute' : 'Mute'"
+                    class="p-1.5 rounded-lg transition-colors"
+                    [class]="p.is_muted ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:bg-gray-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                  </button>
+                  <button (click)="toggleScreenSharePermission(p)" [title]="p.can_share_screen ? 'Revoke screen share' : 'Allow screen share'"
+                    class="p-1.5 rounded-lg transition-colors"
+                    [class]="p.can_share_screen ? 'text-blue-500 hover:bg-blue-50' : 'text-gray-400 hover:bg-gray-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                  <button (click)="toggleSuspend(p)" [title]="p.is_suspended ? 'Unsuspend' : 'Suspend'"
+                    class="p-1.5 rounded-lg transition-colors"
+                    [class]="p.is_suspended ? 'text-orange-500 hover:bg-orange-50' : 'text-gray-400 hover:bg-gray-100'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            }
+            @if (getLiveParticipants().length === 0) {
+              <div class="p-6 text-center text-sm text-gray-400">
+                Waiting for students to join...
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- End Class Confirm -->
+@if (showEndConfirm()) {
+  <app-confirm-dialog
+    title="End Classroom?"
+    message="This will end the session for all participants. You can confirm attendance before ending."
+    confirmText="End Class"
+    cancelText="Cancel"
+    variant="danger"
+    (confirmed)="doEndClassroom()"
+    (cancelled)="showEndConfirm.set(false)" />
+}
+
+<!-- Confirm Attendance Dialog -->
+@if (showAttendanceConfirm()) {
+  <app-confirm-dialog
+    title="Confirm Attendance?"
+    message="This will mark all current participants as having attended this session."
+    confirmText="Confirm"
+    cancelText="Cancel"
+    variant="info"
+    (confirmed)="doConfirmAttendance()"
+    (cancelled)="showAttendanceConfirm.set(false)" />
+}

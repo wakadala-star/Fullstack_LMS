@@ -1,0 +1,143 @@
+<div class="p-6">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fees Management</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Track and manage student fees, payments, and outstanding balances.</p>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+      <p class="mt-1 text-2xl font-semibold text-green-600 dark:text-green-400">{{ stats().totalRevenue | currency }}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pending</p>
+      <p class="mt-1 text-2xl font-semibold text-yellow-600 dark:text-yellow-400">{{ stats().totalPending | currency }}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue Amount</p>
+      <p class="mt-1 text-2xl font-semibold text-red-600 dark:text-red-400">{{ stats().totalOverdue | currency }}</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue Count</p>
+      <p class="mt-1 text-2xl font-semibold text-red-600 dark:text-red-400">{{ stats().overdueCount }}</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <div class="relative flex-1">
+      <input
+        type="text"
+        placeholder="Search by student or description..."
+        [value]="searchTerm()"
+        (input)="onSearch($event)"
+        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+      />
+    </div>
+    <select
+      [value]="selectedStatus()"
+      (change)="onStatusFilter($event)"
+      class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+    >
+      <option value="">All Status</option>
+      <option value="paid">Paid</option>
+      <option value="partial">Partial</option>
+      <option value="unpaid">Unpaid</option>
+      <option value="overdue">Overdue</option>
+    </select>
+  </div>
+
+  <!-- Fees Table -->
+  @if (filteredFees().length > 0) {
+    <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Paid</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Balance</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+          @for (fee of filteredFees(); track fee.id) {
+            <tr
+              (click)="toggleRow(fee.id)"
+              class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">{{ fee.studentName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{{ fee.description }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">UGX {{ fee.amount.toLocaleString() }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">UGX {{ fee.paid.toLocaleString() }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">UGX {{ fee.balance.toLocaleString() }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">{{ fee.dueDate }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                @if (fee.status === 'paid') {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Paid</span>
+                } @else if (fee.status === 'partial') {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Partial</span>
+                } @else if (fee.status === 'unpaid') {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Unpaid</span>
+                } @else if (fee.status === 'overdue') {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Overdue</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap">
+                <button
+                  (click)="$event.stopPropagation(); toggleRow(fee.id)"
+                  class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                >
+                  {{ expandedRowId() === fee.id ? 'Hide' : 'View' }} History
+                </button>
+              </td>
+            </tr>
+            @if (expandedRowId() === fee.id) {
+              <tr>
+                <td colspan="8" class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                  <div class="pl-4">
+                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Payment History</h4>
+                    @if (fee.payments.length > 0) {
+                      <div class="overflow-hidden rounded-md border border-gray-200 dark:border-gray-600">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                          <thead class="bg-gray-100 dark:bg-gray-700">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Date</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Amount</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Method</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Reference</th>
+                            </tr>
+                          </thead>
+                          <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                            @for (payment of fee.payments; track payment.id) {
+                              <tr>
+                                <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">{{ payment.date }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">UGX {{ payment.amount.toLocaleString() }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">{{ payment.method }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">{{ payment.reference }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    } @else {
+                      <p class="text-sm text-gray-500 dark:text-gray-400 italic">No payments recorded yet.</p>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <p class="text-gray-500 dark:text-gray-400 text-sm">No fee records match your search criteria.</p>
+    </div>
+  }
+</div>

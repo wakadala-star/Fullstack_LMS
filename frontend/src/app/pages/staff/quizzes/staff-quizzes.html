@@ -1,0 +1,547 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">My Quizzes</h1>
+      <p class="text-gray-600">Create and manage quizzes for your courses.</p>
+    </div>
+    <button (click)="openCreateModal()"
+      class="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Create Quiz
+    </button>
+  </div>
+
+  @if (message()) {
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+      {{ message() }}
+    </div>
+  }
+
+  <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <div class="flex items-center gap-3">
+      <button (click)="selectedStatus.set('')"
+        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        [class.bg-purple-600]="selectedStatus() === ''"
+        [class.text-white]="selectedStatus() === ''"
+        [class.bg-gray-100]="selectedStatus() !== ''"
+        [class.text-gray-600]="selectedStatus() !== ''"
+        [class.hover:bg-gray-200]="selectedStatus() !== ''">
+        All
+      </button>
+      <button (click)="selectedStatus.set('upcoming')"
+        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        [class.bg-blue-600]="selectedStatus() === 'upcoming'"
+        [class.text-white]="selectedStatus() === 'upcoming'"
+        [class.bg-gray-100]="selectedStatus() !== 'upcoming'"
+        [class.text-gray-600]="selectedStatus() !== 'upcoming'"
+        [class.hover:bg-gray-200]="selectedStatus() !== 'upcoming'">
+        Upcoming
+      </button>
+      <button (click)="selectedStatus.set('active')"
+        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        [class.bg-green-600]="selectedStatus() === 'active'"
+        [class.text-white]="selectedStatus() === 'active'"
+        [class.bg-gray-100]="selectedStatus() !== 'active'"
+        [class.text-gray-600]="selectedStatus() !== 'active'"
+        [class.hover:bg-gray-200]="selectedStatus() !== 'active'">
+        Active
+      </button>
+      <button (click)="selectedStatus.set('completed')"
+        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        [class.bg-gray-600]="selectedStatus() === 'completed'"
+        [class.text-white]="selectedStatus() === 'completed'"
+        [class.bg-gray-100]="selectedStatus() !== 'completed'"
+        [class.text-gray-600]="selectedStatus() !== 'completed'"
+        [class.hover:bg-gray-200]="selectedStatus() !== 'completed'">
+        Completed
+      </button>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    @for (quiz of myQuizzes(); track quiz.id) {
+      <div class="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+        <div class="p-5">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <h3 class="text-base font-semibold text-gray-900">{{ quiz.title }}</h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class.bg-green-100]="quiz.status === 'active'"
+                  [class.text-green-800]="quiz.status === 'active'"
+                  [class.bg-blue-100]="quiz.status === 'upcoming'"
+                  [class.text-blue-800]="quiz.status === 'upcoming'"
+                  [class.bg-gray-100]="quiz.status === 'completed'"
+                  [class.text-gray-800]="quiz.status === 'completed'">
+                  {{ quiz.status }}
+                </span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                  [class.bg-orange-100]="quiz.quizType === 'take_home'"
+                  [class.text-orange-800]="quiz.quizType === 'take_home'"
+                  [class.bg-indigo-100]="quiz.quizType === 'online'"
+                  [class.text-indigo-800]="quiz.quizType === 'online'">
+                  {{ quiz.quizType === 'take_home' ? 'Take-Home' : 'Online' }}
+                </span>
+              </div>
+              <p class="text-sm text-gray-500 mt-1">{{ quiz.courseName }}</p>
+              @if (quiz.description) {
+                <p class="text-sm text-gray-400 mt-1">{{ quiz.description }}</p>
+              }
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-6 text-sm">
+                <div class="text-center">
+                  <p class="text-gray-500 text-xs">Duration</p>
+                  <p class="font-medium text-gray-900">{{ quiz.quizType === 'take_home' ? '14 days' : quiz.duration + 'm' }}</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-gray-500 text-xs">Questions</p>
+                  <p class="font-medium text-gray-900">{{ quiz.totalQuestions }}</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-gray-500 text-xs">Points</p>
+                  <p class="font-medium text-gray-900">{{ quiz.totalPoints }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 ml-4">
+                <button (click)="openEditModal(quiz)"
+                  class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  Edit
+                </button>
+                <button (click)="deleteQuiz(quiz.id)"
+                  class="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          @if (quiz.materials && quiz.materials.length > 0) {
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <p class="text-xs font-medium text-gray-500 mb-2">Materials:</p>
+              <div class="flex flex-wrap gap-2">
+                @for (mat of quiz.materials; track mat.name) {
+                  <a [href]="getFileUrl(mat.url)" target="_blank"
+                    class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded text-xs text-gray-600 hover:bg-gray-100">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    {{ mat.name }}
+                  </a>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="bg-white rounded-xl border border-gray-200 text-center py-12">
+        <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-gray-500">No quizzes found for your courses.</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Create Quiz Modal -->
+@if (showCreateModal()) {
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900">Create Quiz</h2>
+          <button (click)="closeCreateModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        @if (message()) {
+          <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm mb-4">
+            {{ message() }}
+          </div>
+        }
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <input type="text" [ngModel]="newQuizTitle()" (ngModelChange)="newQuizTitle.set($event)"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="Quiz title">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea [ngModel]="newQuizDescription()" (ngModelChange)="newQuizDescription.set($event)"
+              rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="Optional description"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Course *</label>
+              <select [ngModel]="newQuizCourseId()" (ngModelChange)="newQuizCourseId.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                @for (course of myCourses(); track course.id) {
+                  <option [value]="course.id">{{ course.name }} ({{ course.code }})</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Quiz Type *</label>
+              <select [ngModel]="newQuizType()" (ngModelChange)="newQuizType.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <option value="online">Online (Timed, 50 min)</option>
+                <option value="take_home">Take-Home (2 weeks)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="datetime-local" [ngModel]="newQuizStartDate()" (ngModelChange)="newQuizStartDate.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="datetime-local" [ngModel]="newQuizEndDate()" (ngModelChange)="newQuizEndDate.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+          </div>
+
+          @if (newQuizType() === 'online') {
+            <div class="border-t border-gray-200 pt-4 mt-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-900">Questions</h3>
+                <button (click)="addQuestion()" class="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                  + Add Question
+                </button>
+              </div>
+
+              @for (q of newQuizQuestions(); track $index; let i = $index) {
+                <div class="bg-gray-50 rounded-lg p-4 mb-3">
+                  <div class="flex items-start justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-500">Question {{ i + 1 }}</span>
+                    <div class="flex items-center gap-2">
+                      <input type="number" [ngModel]="q.points" (ngModelChange)="updateQuestionPoints(i, +$event)"
+                        min="1" class="w-16 px-2 py-1 border border-gray-300 rounded text-xs text-center" placeholder="Pts">
+                      <button (click)="removeQuestion(i)" class="text-red-400 hover:text-red-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <input type="text" [ngModel]="q.question" (ngModelChange)="updateQuestionText(i, $event)"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2" placeholder="Enter question">
+                  <div class="grid grid-cols-2 gap-2">
+                    @for (opt of q.options; track $index; let oi = $index) {
+                      <div class="flex items-center gap-2">
+                        <input type="radio" [name]="'correct_' + i" [checked]="q.correctAnswer === oi"
+                          (change)="updateCorrectAnswer(i, oi)"
+                          class="text-purple-600">
+                        <span class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                          [class.bg-purple-600]="q.correctAnswer === oi"
+                          [class.text-white]="q.correctAnswer === oi"
+                          [class.bg-gray-200]="q.correctAnswer !== oi"
+                          [class.text-gray-600]="q.correctAnswer !== oi">
+                          {{ 'ABCD'[oi] }}
+                        </span>
+                        <input type="text" [ngModel]="opt" (ngModelChange)="updateOption(i, oi, $event)"
+                          class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm" [placeholder]="'Option ' + (oi + 1)">
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (newQuizQuestions().length === 0) {
+                <p class="text-sm text-gray-400 text-center py-4">No questions yet. Click "Add Question" to start.</p>
+              }
+            </div>
+          }
+
+          @if (newQuizType() === 'take_home') {
+            <div class="border-t border-gray-200 pt-4 mt-4">
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Upload Question Files</h3>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
+                <input type="file" id="quizFileUpload" (change)="onFilesSelected($event)" multiple class="hidden"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.jpg,.jpeg,.png,.gif">
+                <label for="quizFileUpload" class="cursor-pointer">
+                  <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p class="text-sm text-gray-600">Click to upload question files</p>
+                  <p class="text-xs text-gray-400 mt-1">PDF, Word, PowerPoint, images, ZIP (max 100MB each)</p>
+                </label>
+              </div>
+
+              @if (newQuizFiles().length > 0) {
+                <div class="mt-3 space-y-2">
+                  @for (file of newQuizFiles(); track $index; let i = $index) {
+                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                      <svg class="w-5 h-5 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ file.name }}</p>
+                        <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
+                      </div>
+                      <button (click)="removeFile(i)" class="text-red-400 hover:text-red-600 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-3">
+                <p class="text-sm text-orange-800">
+                  <strong>Take-Home Quiz:</strong> Students will have 2 weeks to complete this quiz. They can download the files you upload and submit their answers as file uploads.
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <button (click)="closeCreateModal()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button (click)="createQuiz()" [disabled]="loading()"
+            class="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+            {{ loading() ? 'Creating...' : 'Create Quiz' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit Quiz Modal -->
+@if (showEditModal()) {
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900">Edit Quiz</h2>
+          <button (click)="closeEditModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        @if (editMessage()) {
+          <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm mb-4">
+            {{ editMessage() }}
+          </div>
+        }
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <input type="text" [ngModel]="editTitle()" (ngModelChange)="editTitle.set($event)"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea [ngModel]="editDescription()" (ngModelChange)="editDescription.set($event)"
+              rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+              <input type="number" [ngModel]="editDuration()" (ngModelChange)="editDuration.set(+$event)"
+                min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select [ngModel]="editStatus()" (ngModelChange)="editStatus.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <option value="upcoming">Upcoming</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="datetime-local" [ngModel]="editStartDate()" (ngModelChange)="editStartDate.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="datetime-local" [ngModel]="editEndDate()" (ngModelChange)="editEndDate.set($event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+          </div>
+
+          <!-- Online: Questions -->
+          @if (editQuestions().length > 0) {
+            <div class="border-t border-gray-200 pt-4 mt-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-900">Questions ({{ editQuestions().length }})</h3>
+                <button (click)="editAddQuestion()" class="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                  + Add Question
+                </button>
+              </div>
+
+              @for (q of editQuestions(); track $index; let i = $index) {
+                <div class="bg-gray-50 rounded-lg p-4 mb-3">
+                  <div class="flex items-start justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-500">Question {{ i + 1 }}</span>
+                    <div class="flex items-center gap-2">
+                      <input type="number" [ngModel]="q.points" (ngModelChange)="editUpdateQuestionPoints(i, +$event)"
+                        min="1" class="w-16 px-2 py-1 border border-gray-300 rounded text-xs text-center">
+                      <button (click)="editRemoveQuestion(i)" class="text-red-400 hover:text-red-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <input type="text" [ngModel]="q.question" (ngModelChange)="editUpdateQuestionText(i, $event)"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2">
+                  <div class="grid grid-cols-2 gap-2">
+                    @for (opt of q.options; track $index; let oi = $index) {
+                      <div class="flex items-center gap-2">
+                        <input type="radio" [name]="'edit_correct_' + i" [checked]="q.correctAnswer === oi"
+                          (change)="editUpdateCorrectAnswer(i, oi)"
+                          class="text-purple-600">
+                        <span class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                          [class.bg-purple-600]="q.correctAnswer === oi"
+                          [class.text-white]="q.correctAnswer === oi"
+                          [class.bg-gray-200]="q.correctAnswer !== oi"
+                          [class.text-gray-600]="q.correctAnswer !== oi">
+                          {{ 'ABCD'[oi] }}
+                         </span>
+                         <input type="text" [ngModel]="opt" (ngModelChange)="editUpdateOption(i, oi, $event)"
+                           class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm">
+                       </div>
+                     }
+                   </div>
+                 </div>
+               }
+               <button (click)="editAddQuestion()" class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-colors">
+                 + Add Question
+               </button>
+             </div>
+           }
+
+           <!-- Take-Home: Materials -->
+           @if (editMaterials().length > 0 || editNewFiles().length > 0) {
+             <div class="border-t border-gray-200 pt-4 mt-4">
+               <h3 class="text-sm font-semibold text-gray-900 mb-3">Materials</h3>
+
+               @if (editMaterials().length > 0) {
+                 <div class="space-y-2 mb-3">
+                   @for (mat of editMaterials(); track mat.filename) {
+                     <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                       <svg class="w-5 h-5 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                       </svg>
+                       <a [href]="getFileUrl(mat.url)" target="_blank" class="flex-1 min-w-0 text-sm font-medium text-blue-600 hover:text-blue-700 truncate">
+                         {{ mat.name }}
+                       </a>
+                       <span class="text-xs text-gray-400">{{ mat.size }}</span>
+                       <button (click)="editRemoveMaterial(mat.filename)" class="text-red-400 hover:text-red-600 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                         </svg>
+                       </button>
+                     </div>
+                   }
+                 </div>
+               }
+
+               @if (editNewFiles().length > 0) {
+                 <div class="space-y-2 mb-3">
+                   @for (file of editNewFiles(); track $index; let i = $index) {
+                     <div class="flex items-center gap-3 p-2 bg-green-50 rounded-lg">
+                       <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                       </svg>
+                       <div class="flex-1 min-w-0">
+                         <p class="text-sm font-medium text-gray-900 truncate">{{ file.name }}</p>
+                         <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }} (new)</p>
+                       </div>
+                       <button (click)="editRemoveFile(i)" class="text-red-400 hover:text-red-600 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                         </svg>
+                       </button>
+                     </div>
+                   }
+                 </div>
+               }
+             </div>
+           }
+
+           <!-- Upload new materials -->
+           <div class="border-t border-gray-200 pt-4 mt-4">
+             <h3 class="text-sm font-semibold text-gray-900 mb-3">Upload More Materials</h3>
+             <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-purple-400 transition-colors">
+               <input type="file" id="editFileUpload" (change)="editOnFilesSelected($event)" multiple class="hidden"
+                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.jpg,.jpeg,.png,.gif">
+               <label for="editFileUpload" class="cursor-pointer">
+                 <svg class="w-8 h-8 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                 </svg>
+                 <p class="text-sm text-gray-600">Click to upload files</p>
+               </label>
+             </div>
+           </div>
+         </div>
+
+         <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+           <button (click)="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+             Cancel
+           </button>
+           <button (click)="saveQuiz()" [disabled]="loading()"
+             class="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+             {{ loading() ? 'Saving...' : 'Save Changes' }}
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+}
+
+<!-- Delete Quiz Confirm -->
+@if (showDeleteQuizConfirm()) {
+  <app-confirm-dialog
+    title="Delete Quiz"
+    message="Are you sure you want to delete this quiz? This action cannot be undone."
+    confirmText="Delete"
+    cancelText="Cancel"
+    variant="danger"
+    (confirmed)="confirmDeleteQuiz()"
+    (cancelled)="showDeleteQuizConfirm.set(false)">
+  </app-confirm-dialog>
+}
+
+<!-- Remove Material Confirm -->
+@if (showRemoveMaterialConfirm()) {
+  <app-confirm-dialog
+    title="Remove Material"
+    message="Are you sure you want to remove this material? This action cannot be undone."
+    confirmText="Remove"
+    cancelText="Cancel"
+    variant="danger"
+    (confirmed)="confirmRemoveMaterial()"
+    (cancelled)="showRemoveMaterialConfirm.set(false)">
+  </app-confirm-dialog>
+}

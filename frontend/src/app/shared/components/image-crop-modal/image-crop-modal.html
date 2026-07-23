@@ -1,0 +1,39 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60" (click)="onCancel()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full mx-4 flex flex-col" style="max-width: 400px;" (click)="$event.stopPropagation()">
+
+    <div class="px-5 py-3 border-b border-gray-200">
+      <h3 class="text-base font-semibold text-gray-900">Crop Profile Picture</h3>
+      <p class="text-xs text-gray-500 mt-0.5">Drag the square to select the area you want</p>
+    </div>
+
+    <div class="px-5 py-4 flex justify-center">
+      <canvas #canvas class="rounded-lg cursor-move" style="width: 320px; height: 320px;"></canvas>
+    </div>
+
+    <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isCropping()"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="onCrop()"
+        [disabled]="isCropping()"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        @if (isCropping()) {
+          <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Uploading...
+        } @else {
+          Apply & Upload
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

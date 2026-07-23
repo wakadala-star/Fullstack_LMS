@@ -1,0 +1,261 @@
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+  <!-- Left: hamburger + search (hidden for teachers) -->
+  <div class="flex items-center gap-4">
+    <button (click)="toggleSidebar.emit()" class="lg:hidden p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    @if (auth.userRole() !== 'teacher') {
+      <div class="hidden sm:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-64">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-full" />
+      </div>
+    }
+  </div>
+
+  <!-- Right: teacher tools + notifications + profile -->
+  <div class="flex items-center gap-1">
+    <!-- Teacher-only icons -->
+    @if (auth.userRole() === 'teacher') {
+      <!-- Calendar -->
+      <div class="relative" #calendarDropdown>
+        <button (click)="toggleCalendar()" class="relative p-2 rounded-lg transition-colors"
+          [class]="showCalendar() ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          title="Calendar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </button>
+
+        @if (showCalendar()) {
+          <div class="absolute right-0 top-full mt-2 z-50">
+            <app-task-calendar (close)="onCalendarClose()" />
+          </div>
+        }
+      </div>
+
+      <!-- Tasks -->
+      <a routerLink="/staff/tasks" class="relative p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors" title="My Tasks">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+        @if (pendingTaskCount() > 0) {
+          <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ pendingTaskCount() }}
+          </span>
+        }
+      </a>
+
+      <!-- Attendance -->
+      <a routerLink="/staff/attendance" class="relative p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors" title="Attendance">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </a>
+
+      <!-- Clock In/Out -->
+      <div class="relative" #clockDropdown>
+        <button (click)="toggleClockMenu()" class="relative p-2 rounded-lg transition-colors"
+          [class]="isClockedIn() ? 'text-green-600 hover:text-green-700 bg-green-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          title="Clock In/Out">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          @if (isClockedIn()) {
+            <span class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+          }
+        </button>
+
+        @if (showClockMenu()) {
+          <div class="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+            <div class="p-4 border-b border-gray-100">
+              <h3 class="font-semibold text-gray-900">Clock In / Out</h3>
+            </div>
+            <div class="p-4">
+              @if (isClockedIn()) {
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <div>
+                      <p class="text-sm font-medium text-green-700">Currently Clocked In</p>
+                      <p class="text-xs text-green-600">Since {{ clockInDisplay() }}</p>
+                    </div>
+                  </div>
+                  <div class="text-center py-2">
+                    <p class="text-3xl font-mono font-bold text-gray-900 tracking-wider">{{ elapsedTime() }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Elapsed Time (EAT)</p>
+                  </div>
+                  <button (click)="clockOut()"
+                    class="w-full px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Clock Out
+                  </button>
+                </div>
+              } @else {
+                <div class="space-y-3">
+                  <div class="text-center py-2">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-sm text-gray-600">You are currently clocked out</p>
+                  </div>
+                  <button (click)="clockIn()"
+                    class="w-full px-4 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Clock In
+                  </button>
+                </div>
+              }
+              @if (clockMessage()) {
+                <div class="mt-3 p-2 rounded-lg text-xs text-center"
+                  [class]="clockMessage().includes('success') || clockMessage().includes('Total') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
+                  {{ clockMessage() }}
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="w-px h-6 bg-gray-200 mx-1"></div>
+    }
+
+    <!-- Admin-only: Briefcase (Task Manager) -->
+    @if (auth.userRole() === 'admin') {
+      <div class="relative" #briefcaseDropdown>
+        <button (click)="toggleBriefcase()" class="relative p-2 rounded-lg transition-colors"
+          [class]="showBriefcase() ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          title="Task Manager">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </button>
+
+        @if (showBriefcase()) {
+          <div class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 class="font-semibold text-gray-900">Assign Tasks to Staff</h3>
+              <a routerLink="/admin/task-manager" class="text-xs text-blue-600 hover:text-blue-800 font-medium" (click)="showBriefcase.set(false)">
+                View All
+              </a>
+            </div>
+            <div class="max-h-80 overflow-y-auto">
+              @if (staffList().length === 0) {
+                <div class="p-6 text-center text-sm text-gray-400">No teachers found</div>
+              }
+              @for (teacher of staffList(); track teacher.id) {
+                <a [routerLink]="'/admin/task-manager'" [queryParams]="{ teacherId: teacher.id }"
+                  class="block p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                  (click)="showBriefcase.set(false)">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span class="text-sm font-medium text-blue-700">{{ teacher.name.charAt(0) }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-gray-900">{{ teacher.name }}</p>
+                      <p class="text-xs text-gray-500">{{ teacher.email }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="w-px h-6 bg-gray-200 mx-1"></div>
+    }
+
+    <!-- Notifications -->
+    <div class="relative" #notificationDropdown>
+      <button (click)="toggleNotifications()" class="relative p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        @if (unreadCount() > 0) {
+          <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ unreadCount() }}
+          </span>
+        }
+      </button>
+
+      @if (showNotifications()) {
+        <div class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+          <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900">Notifications</h3>
+            @if (unreadCount() > 0) {
+              <button (click)="markAllAsRead()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                Mark all as read
+              </button>
+            }
+          </div>
+          <div class="max-h-80 overflow-y-auto">
+            @if (notifications().length === 0) {
+              <div class="p-6 text-center text-sm text-gray-400">No notifications yet</div>
+            }
+            @for (notif of notifications(); track notif.id) {
+              <div class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer" [class.bg-blue-50]="!notif.read" (click)="markAsRead(notif.id)">
+                <div class="flex items-start gap-3">
+                  <div class="w-2 h-2 mt-2 rounded-full flex-shrink-0"
+                    [class.bg-blue-500]="notif.type === 'info'"
+                    [class.bg-yellow-500]="notif.type === 'warning'"
+                    [class.bg-green-500]="notif.type === 'success'"
+                    [class.bg-red-500]="notif.type === 'error'">
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900">{{ notif.title }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ notif.message }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ notif.created_at | date:'medium' }}</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Profile -->
+    <div class="relative" #profileDropdown>
+      <button (click)="toggleProfile()" class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+        @if (auth.user()?.avatar) {
+          <img [src]="auth.user()!.avatar" alt="Profile" class="w-8 h-8 rounded-full object-cover" />
+        } @else {
+          <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            {{ auth.user()?.name?.charAt(0) }}
+          </div>
+        }
+        <div class="hidden sm:block text-left">
+          <p class="text-sm font-medium text-gray-900">{{ auth.user()?.name }}</p>
+          <p class="text-xs text-gray-500">{{ getRoleBadge() }}</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      @if (showProfile()) {
+        <div class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-2">
+          <a [routerLink]="getDashboardRoute()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" (click)="showProfile.set(false)">Dashboard</a>
+          <a routerLink="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" (click)="showProfile.set(false)">My Profile</a>
+          <a routerLink="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" (click)="showProfile.set(false)">Home</a>
+          <hr class="my-1 border-gray-100" />
+          <button (click)="onLogout()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign out</button>
+        </div>
+      }
+    </div>
+  </div>
+</header>
+<app-feedback-modal #feedbackModal (closed)="onFeedbackClosed()" />

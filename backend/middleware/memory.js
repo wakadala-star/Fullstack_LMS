@@ -70,17 +70,6 @@ const formatUptime = (seconds) => {
 };
 
 const memoryMonitor = (req, res, next) => {
-  const memBefore = process.memoryUsage().heapUsed;
-
-  res.on('finish', () => {
-    const memAfter = process.memoryUsage().heapUsed;
-    const memDiff = memAfter - memBefore;
-
-    if (memDiff > 10 * 1024 * 1024) {
-      console.warn(`High memory usage detected: ${formatBytes(memDiff)} increase`);
-    }
-  });
-
   next();
 };
 

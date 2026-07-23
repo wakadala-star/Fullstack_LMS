@@ -1,0 +1,100 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Results</h1>
+    <div class="flex items-center space-x-4">
+      <label class="text-sm font-medium text-gray-700">Filter by Child:</label>
+      <select 
+        class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="selectedChildId()"
+        (change)="onChildChange($event)">
+        <option value="all">All Children</option>
+        @for (child of children(); track child.id) {
+          <option [value]="child.id">{{ child.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    @for (child of children(); track child.id) {
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+            {{ child.name.charAt(0) }}
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">{{ child.name }}</p>
+            <p class="text-2xl font-semibold" [ngClass]="getGradeColor(childAverageGrades()[child.id] || 0)">
+              {{ childAverageGrades()[child.id] || 0 }}%
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+    
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Overall Average</p>
+          <p class="text-2xl font-semibold" [ngClass]="getGradeColor(overallAverage())">
+            {{ overallAverage() }}%
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grades Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b">
+      <h2 class="text-lg font-semibold">Grade History</h2>
+    </div>
+    
+    @if (filteredGrades().length === 0) {
+      <div class="p-8 text-center text-gray-500">
+        No grades found for the selected filter.
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Child</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Course</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Assessment</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Type</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Score</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Grade</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @for (grade of filteredGrades(); track grade.id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm font-medium">{{ getChildName(grade.studentId) }}</td>
+                <td class="px-6 py-4 text-sm">{{ getCourseName(grade.courseId) }}</td>
+                <td class="px-6 py-4 text-sm">{{ grade.assessmentName }}</td>
+                <td class="px-6 py-4 text-sm">
+                  <span class="px-2 py-1 text-xs rounded-full" [ngClass]="getAssessmentBadgeClass(grade.assessmentType)">
+                    {{ grade.assessmentType }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm" [ngClass]="getGradeColor(grade.percentage)">
+                  {{ grade.score }}/{{ grade.maxScore }} ({{ grade.percentage }}%)
+                </td>
+                <td class="px-6 py-4 text-sm font-medium">{{ grade.letterGrade }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ grade.date }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

@@ -1,6 +1,11 @@
 node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
 .env
-backend/logs/*.log
+.vscode/
+uploads/
+backend/logs/
 .DS_Store
 Thumbs.db
 *.log

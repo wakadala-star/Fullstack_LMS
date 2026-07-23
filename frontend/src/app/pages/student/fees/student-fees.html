@@ -1,0 +1,122 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">My Fees</h1>
+    <p class="text-gray-600">View your fee records and payment history</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Total Fees</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1">UGX {{ totalFees().toLocaleString() }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Total Paid</p>
+      <p class="text-2xl font-bold text-green-600 mt-1">UGX {{ totalPaid().toLocaleString() }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Balance Due</p>
+      <p class="text-2xl font-bold text-yellow-600 mt-1">UGX {{ totalBalance().toLocaleString() }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Overdue</p>
+      <p class="text-2xl font-bold" [class.text-red-600]="overdueCount() > 0" [class.text-gray-900]="overdueCount() === 0">{{ overdueCount() }}</p>
+    </div>
+  </div>
+
+  <!-- Fee Records -->
+  @if (fees().length === 0) {
+    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <p class="text-gray-500 font-medium">No fee records found</p>
+    </div>
+  } @else {
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="divide-y divide-gray-100">
+        @for (fee of fees(); track fee.id) {
+          <div>
+            <!-- Main Row -->
+            <div
+              class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+              (click)="toggleExpand(fee.id)"
+            >
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button class="shrink-0 w-5 h-5 text-gray-400 transition-transform duration-200"
+                  [class.rotate-90]="expandedId() === fee.id">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-gray-900">{{ fee.description }}</p>
+                  <p class="text-xs text-gray-500">Due: {{ fee.dueDate }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 ml-4">
+                <div class="text-right hidden sm:block">
+                  <p class="text-sm font-medium text-gray-900">UGX {{ fee.amount.toLocaleString() }}</p>
+                  <p class="text-xs text-gray-500">Paid: UGX {{ fee.paid.toLocaleString() }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 text-xs font-medium rounded-full border"
+                  [ngClass]="getStatusClass(fee.status)">
+                  {{ fee.status }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Progress bar for partial/unpaid/overdue -->
+            @if (fee.status !== 'paid') {
+              <div class="px-5 pb-2">
+                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                  <span>Payment progress</span>
+                  <span>{{ getProgressPercent(fee) }}%</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full bg-blue-500 transition-all duration-300"
+                    [style.width.%]="getProgressPercent(fee)">
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Expanded Payment History -->
+            @if (expandedId() === fee.id) {
+              <div class="px-5 pb-4 ml-8">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Payment History</p>
+                @if (fee.payments.length === 0) {
+                  <p class="text-sm text-gray-400">No payments made yet</p>
+                } @else {
+                  <div class="bg-gray-50 rounded-lg overflow-hidden">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="text-left text-xs text-gray-500 uppercase tracking-wide">
+                          <th class="px-3 py-2 font-medium">Date</th>
+                          <th class="px-3 py-2 font-medium">Amount</th>
+                          <th class="px-3 py-2 font-medium">Method</th>
+                          <th class="px-3 py-2 font-medium">Reference</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200">
+                        @for (payment of fee.payments; track payment.id) {
+                          <tr class="text-gray-700">
+                            <td class="px-3 py-2">{{ payment.date }}</td>
+                            <td class="px-3 py-2 font-medium text-green-600">UGX {{ payment.amount.toLocaleString() }}</td>
+                            <td class="px-3 py-2">{{ payment.method }}</td>
+                            <td class="px-3 py-2 text-gray-500">{{ payment.reference }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,138 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Student Dashboard</h1>
+    <p class="text-gray-600">Welcome back, {{ auth.user()?.name }}. Keep up the great work!</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    @for (stat of stats(); track stat.label) {
+      <div class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">{{ stat.label }}</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ stat.value }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+            [class.bg-blue-50]="stat.color === 'blue'"
+            [class.bg-green-50]="stat.color === 'green'"
+            [class.bg-yellow-50]="stat.color === 'yellow'"
+            [class.bg-purple-50]="stat.color === 'purple'">
+            @switch (stat.icon) {
+              @case ('courses') {
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              }
+              @case ('grade') {
+                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              }
+              @case ('fees') {
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              }
+              @case ('quizzes') {
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <a routerLink="/student/courses" class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow group">
+      <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      </div>
+      <h3 class="font-semibold text-gray-900">Browse Courses</h3>
+      <p class="text-sm text-gray-500 mt-1">Explore available courses</p>
+    </a>
+    <a routerLink="/student/fees" class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow group">
+      <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center mb-3 group-hover:bg-yellow-100 transition-colors">
+        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="font-semibold text-gray-900">Pay Fees</h3>
+      <p class="text-sm text-gray-500 mt-1">View and pay outstanding fees</p>
+    </a>
+    <a routerLink="/student/quizzes" class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow group">
+      <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mb-3 group-hover:bg-purple-100 transition-colors">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      </div>
+      <h3 class="font-semibold text-gray-900">Take a Quiz</h3>
+      <p class="text-sm text-gray-500 mt-1">Start your upcoming quizzes</p>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- My Enrolled Courses -->
+    <div class="bg-white rounded-xl border border-gray-200">
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">My Courses</h2>
+        <a routerLink="/student/courses" class="text-sm text-blue-600 hover:text-blue-700 font-medium">View all</a>
+      </div>
+      @if (loading()) {
+        <div class="p-8 text-center">
+          <svg class="animate-spin w-6 h-6 text-blue-600 mx-auto" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      } @else if (recentEnrollments().length > 0) {
+        <div class="p-5 space-y-3">
+          @for (enroll of recentEnrollments(); track enroll.code) {
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div>
+                <p class="text-sm font-medium text-gray-900">{{ enroll.course }}</p>
+                <p class="text-xs text-gray-500">{{ enroll.code }} &middot; {{ enroll.instructor }}</p>
+              </div>
+              <span class="text-xs text-gray-400">{{ enroll.date }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="p-8 text-center">
+          <p class="text-gray-400 text-sm">No courses enrolled yet</p>
+          <a routerLink="/student/courses" class="mt-2 inline-block text-sm text-blue-600 hover:text-blue-700 font-medium">Browse courses</a>
+        </div>
+      }
+    </div>
+
+    <!-- Pending Enrollment Requests -->
+    <div class="bg-white rounded-xl border border-gray-200">
+      <div class="p-5 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-900">Pending Requests</h2>
+      </div>
+      @if (pendingEnrollments().length > 0) {
+        <div class="p-5 space-y-3">
+          @for (pending of pendingEnrollments(); track pending.code) {
+            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-900">{{ pending.course }}</p>
+                <p class="text-xs text-gray-500">{{ pending.code }}</p>
+              </div>
+              <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">Pending</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="p-8 text-center">
+          <p class="text-gray-400 text-sm">No pending requests</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
